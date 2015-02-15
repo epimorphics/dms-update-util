@@ -1,0 +1,13 @@
+#!/bin/bash
+# Script use by dms_update to start the local fuseki service
+# This is a configuration point
+# The normal action would be just "service fuseki start"
+# This version is for dev purposes only
+
+readonly CONFIG=/opt/dms-update/config.json
+DBLOCATION=$( jq -r ".dblocation"  $CONFIG)
+DBNAME=$( jq -r ".dbname"  $CONFIG)
+
+cd /usr/share/fuseki
+nohup ./fuseki-server --mgtPort=3131 --update --loc="$DBLOCATION/$DBNAME" /ds &> fuseki.log &
+

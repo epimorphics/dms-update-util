@@ -1,0 +1,32 @@
+#!/bin/bash
+# Script to create TDB from a dump S3 and start fuseki. 
+# Starting fuseki is delegated to /opt/dms-update/bin/start-fuseki
+# Assumes fuseki binary (for running tdbloader) is availabe in /usr/share/fuseki
+# usage: install_dump s3file dbname
+
+readonly FUSEKI_BASE=/usr/share/fuseki
+readonly TDBLOADER_MEM="-Xmx1024M"
+readonly FUSEKI_JAR="$FUSEKI_BASE/fuseki-server.jar"
+
+[[ $# = 3 ]] || { echo "usage: install_dump s3file dbname [optfile]" 1>&2 ; exit 1 ; }
+readonly s3file="$1"
+readonly dbname="$2"
+readonly optfile="$3"
+readonly file="$dbname.nq.gz"
+
+report_error() {
+    echo "Failed: $*"
+    exit 1
+}
+
+aws s3 cp $s3file "$file" || report_error "Failed to fetch dump file"
+
+java $TDBLOADER_MEM -classpath $FUSEKI_JAR tdb.tdbloader --loc=$dbname "$file" || report_error "Failed to build tdb image"
+rm "$file"
+
+if [[ -n $optfile ]]; then
+    rm $dbname/stats.opt
+    aws s3 cp $optfile "$dbname/$(basename $optfile)" || report_error "Failed to fetch opt file"
+fi
+
+/opt/dms-update/bin/start_fuseki

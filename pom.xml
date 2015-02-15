@@ -1,0 +1,221 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.epimorphics</groupId>
+  <artifactId>dms-update-util</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>dms-update-util</name>
+  <packaging>jar</packaging>
+  <description>Update data server from S3 state cache</description>
+
+  <scm>
+    <developerConnection>scm:git:ssh://git@github.com:epimorphics/dms-update-util.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <repositories>
+    <repository>
+      <id>apache-repo-releases</id>
+      <url>https://repository.apache.org/content/repositories/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+
+    </repository>
+
+    <repository>
+      <id>apache-repo-snapshots</id>
+      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+ 
+ <!-- 
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>epi-public-repo</id>
+      <name>Epimorphics Public Repository</name>
+      <url>http://repository.epimorphics.com</url>
+    </repository>
+ -->
+ 
+    <repository>  
+     <id>epi-public-s3-snapshot</id>  
+     <name>Epimorphics S3 snapshot repository</name>  
+     <url>s3://epi-repository/snapshot</url>  
+     <releases>  
+       <enabled>false</enabled>  
+     </releases>  
+     <snapshots>  
+       <enabled>true</enabled>  
+     </snapshots>  
+    </repository>  
+
+    <repository>  
+     <id>epi-public-s3-release</id>  
+     <name>Epimorphics S3 release repository</name>  
+     <url>s3://epi-repository/release</url>  
+     <releases>  
+       <enabled>true</enabled>  
+     </releases>  
+     <snapshots>  
+       <enabled>false</enabled>  
+     </snapshots>  
+    </repository>  
+    
+  </repositories>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk</artifactId>
+        <version>1.9.19</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20141113</version>
+    </dependency>
+
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>1.17</version>
+    </dependency>
+ 
+  </dependencies>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>1.7</version>
+        <configuration>
+          <connectionType>developerConnection</connectionType>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+    
+          <transformers>
+            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+              <mainClass>com.epimorphics.dmsupdate.DMSUpdate</mainClass>
+            </transformer>
+            <!-- 
+            <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+              <resource>log4j.properties</resource>
+              <file>src/test/resources/log4j.properties</file>
+            </transformer>
+             -->
+          </transformers>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+             <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>run</shadedClassifierName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ftp</artifactId>
+        <version>2.6</version>
+      </extension>
+      
+      <extension>
+        <groupId>org.springframework.build</groupId>
+        <artifactId>aws-maven</artifactId>
+        <version>5.0.0.RELEASE</version>
+      <!-- 
+        <groupId>org.springframework.build.aws</groupId>  
+        <artifactId>org.springframework.build.aws.maven</artifactId>  
+        <version>3.0.0.RELEASE</version>          
+         -->
+      </extension>
+
+    </extensions>
+  </build>
+
+  <distributionManagement>
+     <repository>  
+         <id>epi-public-s3-release</id>  
+         <name>Epimorphics S3 release repository</name>  
+         <url>s3://epi-repository/release</url>  
+     </repository>
+       
+     <snapshotRepository>  
+         <id>epi-public-s3-snapshot</id>  
+         <name>Epimorphics S3 snapshot repository</name>  
+         <url>s3://epi-repository/snapshot</url>  
+     </snapshotRepository>  
+ 
+  </distributionManagement>
+
+</project>

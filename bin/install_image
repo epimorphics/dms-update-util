@@ -1,0 +1,15 @@
+#!/bin/bash
+# Script to install a baseline image from S3 into the current directory
+# and start fuseki. Starting fuseki is delegated to /opt/dms-update/bin/start-fuseki
+# usage: install_image s3file dbname
+
+[[ $# >= 2 ]] || { echo "usage: install_image s3file dbname" 1>&2 ; exit 1 ; }
+readonly s3file="$1"
+readonly dbname="$2"
+readonly file="$dbname.tgz"
+
+aws s3 cp $s3file "$file"
+tar xzf "$file"
+rm "$file"
+
+/opt/dms-update/bin/start_fuseki

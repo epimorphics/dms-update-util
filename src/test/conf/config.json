@@ -1,0 +1,6 @@
+{
+    "s3root" : "s3://dms-deploy/images/test",
+    "dblocation" : "/tmp",
+    "dbname" : "DS-DB",
+    "service" : "http://localhost:3030/ds/"
+}

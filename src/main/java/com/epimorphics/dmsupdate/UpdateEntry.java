@@ -1,0 +1,226 @@
+/******************************************************************
+ * File:        UpdateEntry.java
+ * Created by:  Dave Reynolds
+ * Created on:  14 Feb 2015
+ * 
+ * (c) Copyright 2015, Epimorphics Limited
+ *
+ *****************************************************************/
+
+package com.epimorphics.dmsupdate;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import com.amazonaws.services.s3.model.S3Object;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+
+/**
+ * Represents a single entry in the S3 data state collection.
+ */
+public class UpdateEntry {
+    private static final String APPLICATION_SPARQL_UPDATE = "application/sparql-update";
+
+    private static final Logger logger = LogManager.getLogger( UpdateEntry.class );
+    
+    private static final int N_RETRIES = 3;
+    private static final long WAIT_PERIOD = 3 * 1000;
+    
+    protected String objectName;
+    protected Operation op;
+    protected String arg;
+    protected String label;
+    protected String effectiveDate;
+    protected String format;
+    
+    public UpdateEntry(String objectName) {
+        this.objectName = objectName;
+        
+        Matcher matcher = OBJECT_FORMAT.matcher(objectName);
+        if (matcher.matches()) {
+            effectiveDate = matcher.group(1) + "-" + matcher.group(2);
+            label = matcher.group(3);
+            op = Operation.valueOf( matcher.group(4) );
+            arg = Util.decodePercent( matcher.group(5) );
+            format = matcher.group(6);
+        }
+    }
+
+    protected static final Pattern OBJECT_FORMAT = Pattern.compile(".*/([0-9-]+)/([0-9-]+)/([^_]*)_([^_\\.]*)_?([^_\\.]*)\\.?(.*)$");
+    
+    public String getObjectName() {
+        return objectName;
+    }
+
+    public Operation getOp() {
+        return op;
+    }
+
+    public String getArg() {
+        return arg;
+    }
+    
+    public void setArg(String arg) {
+        this.arg = arg;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getEffectiveDate() {
+        return effectiveDate;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+    
+    public String getLocalName() {
+        int split = objectName.lastIndexOf("/");
+        return objectName.substring(split+1);
+    }
+    
+    public String asCommand() {
+        String command = String.format("op_%s s3://%s/%s %s", 
+                op ==  Operation.postproc ? "update" : op.name(), 
+                Config.getBucketName(), objectName,
+                effectiveDate);
+        if (op != Operation.postproc && arg != null && !arg.isEmpty()) {
+            command += " " + arg;
+        }
+        return command;
+    }
+    
+    public String getS3Name() {
+        return "s3://" + Config.getBucketName() + "/" + objectName;
+    }
+    
+    
+    /**
+     * Run the update action.
+     * If a database install or build-from-dump is required then
+     * uses external shell script "install_image" or "install_dump". 
+     * Assumes that these leave the fuseki server running so that it
+     * can receive further updates.
+     * @return the effectiveDate of this operation
+     * @throws IOException 
+     */
+    public String execute() throws IOException {
+        logger.info("Execute: " + asCommand());
+        switch(op) {
+        case image:
+        case dump:
+            install();
+            break;
+            
+        case replace:
+            sendData(false, false);
+            break;
+            
+        case update:
+        case postproc:
+            sendData(true, true);
+            break;
+            
+        case add:
+            sendData(false, true);
+            break;
+        
+        case drop:
+            ClientResponse response= Client.create()
+                .resource(Config.getService() + "data")
+                .queryParam("graph", arg)
+                .type(APPLICATION_SPARQL_UPDATE)
+                .delete(ClientResponse.class);
+            if (response.getStatus() >= 500) {
+                throw new DUException("Update failed with response " + response);
+            }
+            break;
+            
+        default:
+            throw new DUException("Unimplemented operation: " + op);
+        }
+        return effectiveDate;
+    }
+    
+    protected void sendData(boolean isUpdate, boolean isPost) throws IOException {
+        S3Object object = S3Util.getObject(objectName);
+        try {
+            InputStream content = object.getObjectContent();
+            String fmt = format;
+            if (fmt.endsWith(".gz")) {
+                fmt = fmt.replace(".gz", "");
+                content = new GZIPInputStream(content);
+            }
+            String mediaType = isUpdate ? APPLICATION_SPARQL_UPDATE : mediaTypeFor(fmt);
+            WebResource resource = Client.create()
+                    .resource(Config.getService() + (isUpdate ? "update" : "data"));
+            if (!isUpdate) {
+                resource = resource.queryParam("graph", arg);
+            }
+            WebResource.Builder builder = resource.type( mediaType ).entity( content ); 
+            ClientResponse response = isPost ? builder.post(ClientResponse.class) : builder.put(ClientResponse.class);
+            if (response.getStatus() >= 400) {
+                throw new DUException("Update failed with response " + response);
+            }
+        } finally {
+            object.close();
+        }
+    }
+
+    protected void install() throws IOException {
+        String script = "install_" + op.name();
+        int status = new ShellScript(Config.BIN_DIR + script, Config.getDBLocation())
+                        .run( getS3Name(), Config.getDBName(), arg );
+        if (status != 0) {
+            throw new DUException(script + " failed");
+        }
+        checkServiceUp();
+    }
+    
+    protected void checkServiceUp() {
+        for (int i = 0; i < N_RETRIES; i++) {
+            try {
+                ClientResponse response = Client
+                    .create()
+                    .resource(Config.getService() + "query")
+                    .queryParam("query", "ASK {}")
+                    .get(ClientResponse.class);
+                if (response.getStatus() >= 400) {
+                    throw new DUException("Bad response from fuseki service " + response.getStatus());
+                }
+                return;
+            } catch (Exception e) {
+                try {
+                    Thread.sleep(WAIT_PERIOD);
+                } catch (InterruptedException e1) {
+                    throw new DUException("Interrupted while waiting for service to become live");
+                }
+            }
+        }
+        throw new DUException("Failed to contact fuseki service");
+    }
+    
+    protected String mediaTypeFor(String fmt) {
+        if ("ttl".equals(fmt)) {
+            return "text/turtle";
+        } else if ("rdf".equals(fmt)) {
+            return "application/rdf+xml";
+        } else if ("nt".equals(fmt)) {
+            return "application/n-triples";
+        } else if ("ru".equals(fmt)) {
+            return APPLICATION_SPARQL_UPDATE;
+        } else {
+            throw new DUException("Could not find media type for update format: " + fmt);
+        }
+    }
+}
