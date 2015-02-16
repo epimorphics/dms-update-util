@@ -43,6 +43,8 @@ public class Config {
     public static final String DBNAME = "dbname";
     public static final String SERVICE = "service";
     
+    public static final String DEFAULT_DATE = "1970-01-01-00-00-00-0000";
+    
     protected static JsonNode config;
     protected static String bucketName;
     protected static String prefix;
@@ -99,7 +101,7 @@ public class Config {
             encoded = Files.readAllBytes(Paths.get(EFFECTIVE_DATE_FILE));
             return new String(encoded, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            return null;
+            return DEFAULT_DATE;
         }
     }
     

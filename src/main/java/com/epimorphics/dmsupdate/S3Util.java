@@ -11,6 +11,8 @@ package com.epimorphics.dmsupdate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
@@ -57,14 +59,34 @@ public class S3Util {
     }
     
     public static List<UpdateEntry> listUpdatesSince(String effectiveDate) {
+        Matcher m = DAY_ED_PATTERN.matcher(effectiveDate.trim());
+        if (!m.matches()) {
+            throw new DUException("Effective date malformed, couldn't determine day: " + effectiveDate);
+        }
+        String day = m.group(1);
+        List<String> candidates = new ArrayList<String>();
+        for (String object : listObjects("updates", false)) {
+            m = DAY_DIR_PATTERN.matcher(object);
+            if (m.matches()) {
+                String cday = m.group(1);
+                if (cday.compareTo(day) >= 0) {
+                    candidates.add( "updates/" + cday );
+                }
+            }
+        }
         List<UpdateEntry> entries = new ArrayList<>();
-        for (UpdateEntry e : listEntries("updates")) {
-            if (e.getEffectiveDate().compareTo(effectiveDate) > 0) {
-                entries.add(e);
+        for (String candidate : candidates) {
+            for (UpdateEntry e : listEntries(candidate)) {
+                if (e.getEffectiveDate().compareTo(effectiveDate) > 0) {
+                    entries.add(e);
+                }
             }
         }
         return entries;
     }
+    
+    static final Pattern DAY_DIR_PATTERN = Pattern.compile(".*/([0-9]{4}-[0-9]{2}-[0-9]{2})/");
+    static final Pattern DAY_ED_PATTERN = Pattern.compile("([0-9]{4}-[0-9]{2}-[0-9]{2})-.*");
     
     public static S3Object getObject(String name) {
         AmazonS3Client client = new AmazonS3Client();
