@@ -179,8 +179,13 @@ public class UpdateEntry {
 
     protected void install() throws IOException {
         String script = "install_" + op.name();
-        int status = new ShellScript(Config.BIN_DIR + script, Config.getDBLocation())
-                        .run( getS3Name(), Config.getDBName(), arg );
+        ShellScript ss = new ShellScript(Config.BIN_DIR + script, Config.getDBLocation());
+        int status = -1;
+        if (arg != null && ! arg.isEmpty()) {
+            status = ss.run( getS3Name(), Config.getDBName(), arg );
+        } else {
+            status = ss.run( getS3Name(), Config.getDBName());
+        }
         if (status != 0) {
             throw new DUException(script + " failed");
         }
