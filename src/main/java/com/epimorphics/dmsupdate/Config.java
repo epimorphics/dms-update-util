@@ -36,6 +36,7 @@ public class Config {
     public static final String BIN_DIR = CONFIG_AREA + "/bin/";
     public static final String LOG_AREA = "/var/opt/dms-update";
     public static final String EFFECTIVE_DATE_FILE = LOG_AREA + "/lastEffectiveDate";
+    public static final String STATUS_FILE = LOG_AREA + "/status.json";
     public static final String LOCK_FILE = LOG_AREA + "/lock";
     
     public static final String S3ROOT = "s3root";
