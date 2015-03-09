@@ -58,10 +58,10 @@ public class S3Util {
         return entries;
     }
     
-    public static List<UpdateEntry> listUpdatesSince(String effectiveDate) {
-        Matcher m = DAY_ED_PATTERN.matcher(effectiveDate.trim());
+    public static List<UpdateEntry> listNewUpdates(Status status) {
+        Matcher m = DAY_ED_PATTERN.matcher( status.getEffectiveDate() );
         if (!m.matches()) {
-            throw new DUException("Effective date malformed, couldn't determine day: " + effectiveDate);
+            throw new DUException("Effective date malformed, couldn't determine day: " + status.getEffectiveDate() );
         }
         String day = m.group(1);
         List<String> candidates = new ArrayList<String>();
@@ -74,10 +74,14 @@ public class S3Util {
                 }
             }
         }
+        String today = status.getToday();
+        if ( ! candidates.contains(today) ) {
+            candidates.add(today);
+        }
         List<UpdateEntry> entries = new ArrayList<>();
         for (String candidate : candidates) {
             for (UpdateEntry e : listEntries(candidate)) {
-                if (e.getEffectiveDate().compareTo(effectiveDate) > 0) {
+                if ( status.shouldProcess( e.getEffectiveDate() ) ) {
                     entries.add(e);
                 }
             }

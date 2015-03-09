@@ -10,16 +10,8 @@
 package com.epimorphics.dmsupdate;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,13 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Configuration information loaded from /opt/dms-update/config.json
  */
 public class Config {
-    private static final Logger logger = LogManager.getLogger( Config.class );
-    
     public static final String CONFIG_AREA = "/opt/dms-update";
     public static final String CONFIG_FILE = CONFIG_AREA + "/config.json";
     public static final String BIN_DIR = CONFIG_AREA + "/bin/";
     public static final String LOG_AREA = "/var/opt/dms-update";
     public static final String EFFECTIVE_DATE_FILE = LOG_AREA + "/lastEffectiveDate";
+    public static final String STATUS_FILE = LOG_AREA + "/status.json";
     public static final String LOCK_FILE = LOG_AREA + "/lock";
     
     public static final String S3ROOT = "s3root";
@@ -93,26 +84,6 @@ public class Config {
     
     public static String getService() {
         return get(SERVICE);
-    }
-    
-    public static String getEffectiveDate() {
-        byte[] encoded;
-        try {
-            encoded = Files.readAllBytes(Paths.get(EFFECTIVE_DATE_FILE));
-            return new String(encoded, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return DEFAULT_DATE;
-        }
-    }
-    
-    public static void recordEffectiveDate(String effectiveDate) {
-        try {
-            FileWriter out = new FileWriter(EFFECTIVE_DATE_FILE);
-            out.write(effectiveDate);
-            out.close();
-        } catch (IOException e) {
-            logger.fatal("Failed to save effective date", e);
-        }
     }
     
 }
