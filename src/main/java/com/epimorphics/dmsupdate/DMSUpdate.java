@@ -50,14 +50,17 @@ public class DMSUpdate {
         FileLock lock = lockStream.getChannel().lock();
         
         try {
+            Status status = Status.loadStatus();
             String command = args[0];
             if (command.equals("--plan")) {
-                createPlan().print( System.out );
+                createPlan(status).print( System.out );
             } else if (command.equals("--perform")) {
-                if ( ! createPlan().execute() ) {
+                if ( ! createPlan(status).execute() ) {
                     logger.error("Execution failed");
+                    status.save();
                     System.exit(1);
                 }
+                status.save();
             } else {
                 System.err.println("Action not recognized: " + command);
                 System.exit(1);
@@ -72,9 +75,8 @@ public class DMSUpdate {
         }
     }
     
-    public static Plan createPlan() {
-        Plan plan = new Plan();
-        String effectiveDate = Config.getEffectiveDate();
+    public static Plan createPlan(Status status) {
+        Plan plan = new Plan(status);
         if ( !dbExists()) {
             UpdateEntry lastMatch = null;
             UpdateEntry optFile = null;
@@ -92,12 +94,9 @@ public class DMSUpdate {
                 lastMatch.setArg(optFile.getS3Name());
             }
             plan.add( lastMatch );
-            effectiveDate = lastMatch.getEffectiveDate();
+            status.setEffectiveDate( lastMatch.getEffectiveDate() );
         }
-        if (effectiveDate == null) {
-            throw new DUException("Can't determine effective date of current state");
-        }
-        plan.addAll( S3Util.listUpdatesSince(effectiveDate) );
+        plan.addAll( S3Util.listNewUpdates(status) );
         plan.prune();
         return plan;
     }

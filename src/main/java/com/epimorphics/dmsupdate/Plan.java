@@ -30,9 +30,11 @@ public class Plan {
     private static final Logger logger = LogManager.getLogger( Plan.class );
     
     protected List<UpdateEntry> plan;
+    protected Status status;
     
-    public Plan() {
+    public Plan(Status status) {
         plan = new ArrayList<>();
+        this.status = status;
     }
     
     public void add(UpdateEntry e) {
@@ -44,7 +46,7 @@ public class Plan {
     }
     
     /**
-     * Return redundant replace or postprocess commands in the plan
+     * Remove redundant replace or postprocess commands from the plan
      */
     public void prune() {
         Map<String, UpdateEntry> seen = new HashMap<String, UpdateEntry>();
@@ -86,16 +88,11 @@ public class Plan {
         for (UpdateEntry update : plan) {
             try {
                 effectiveDate = update.execute();
+                status.recordUpdate(effectiveDate);
             } catch (Exception e) {
                 logger.error("Execution failed with exception", e);
-                if (effectiveDate != null) {
-                    Config.recordEffectiveDate(effectiveDate);
-                }
                 return false;
             }
-        }
-        if (effectiveDate != null) {
-            Config.recordEffectiveDate(effectiveDate);
         }
         return true;
     }
