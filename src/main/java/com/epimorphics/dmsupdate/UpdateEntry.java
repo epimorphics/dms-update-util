@@ -50,11 +50,16 @@ public class UpdateEntry {
             label = matcher.group(3);
             op = Operation.valueOf( matcher.group(4) );
             arg = Util.decodePercent( matcher.group(5) );
-            format = matcher.group(6);
+            if (arg != null && arg.contains(".")) {
+                format = Util.extension(arg);
+                arg = Util.removeExtension(arg);
+            } else {
+                format = "";
+            }
         }
     }
 
-    protected static final Pattern OBJECT_FORMAT = Pattern.compile(".*/([0-9-]+)/([0-9-]+)/([^_]*)_([^_\\.]*)_?([^_\\.]*)\\.?(.*)$");
+    protected static final Pattern OBJECT_FORMAT = Pattern.compile(".*/([0-9-]+)/([0-9-]+)/([^_]*)_([^_\\.]*)_?(.*)$");
     
     public String getObjectName() {
         return objectName;

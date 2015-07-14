@@ -32,4 +32,46 @@ public class Util {
         System.arraycopy(decode, 0, after, 0, p);
         return new String(after, StandardCharsets.UTF_8);
     }
+    
+
+    /**
+     * Remove a trailing .xxx extension from a file name
+     */
+    public static String removeExtension(String f) {
+        return splitBeforeLast(f, ".");
+    }
+
+    /**
+     * Find the .xxx extension of a file name
+     */
+    public static String extension(String f) {
+        return splitAfterLast(f, ".");
+    }
+
+    /**
+     * Return segment of a string after the last occurrence of "at"
+     */
+    public static String splitAfterLast(String filename, String at) {
+        int split = filename.lastIndexOf(at);
+        if (split == -1) {
+            return filename;
+        } else {
+            return filename.substring(split + 1);
+        }
+    }
+
+
+    /**
+     * Return segment of a string before the last occurrence of "at"
+     */
+    public static String splitBeforeLast(String filen, String at) {
+        int split = filen.lastIndexOf(at);
+        if (split == -1) {
+            return filen;
+        } else {
+            return filen.substring(0, split);
+        }
+
+    }
+    
 }
