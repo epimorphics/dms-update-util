@@ -8,7 +8,7 @@ readonly FUSEKI_BASE=/usr/share/fuseki
 readonly TDBLOADER_MEM="-Xmx1024M"
 readonly FUSEKI_JAR="$FUSEKI_BASE/fuseki-server.jar"
 
-(( $# = 2 || $= = 3 )) || { echo "usage: install_dump s3file dbname [optfile]" 1>&2 ; exit 1 ; }
+[[ $# = 2 || $# = 3 ]] || { echo "usage: install_dump s3file dbname [optfile]" 1>&2 ; exit 1 ; }
 readonly s3file="$1"
 readonly dbname="$2"
 readonly optfile="$3"
