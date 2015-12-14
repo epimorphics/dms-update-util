@@ -30,6 +30,7 @@ public class Plan {
     private static final Logger logger = LogManager.getLogger( Plan.class );
     
     protected List<UpdateEntry> plan;
+    protected Set<UpdateEntry> drop = new HashSet<>();
     protected Status status;
     
     public Plan(Status status) {
@@ -50,7 +51,6 @@ public class Plan {
      */
     public void prune() {
         Map<String, UpdateEntry> seen = new HashMap<String, UpdateEntry>();
-        Set<UpdateEntry> drop = new HashSet<>();
         
         for (UpdateEntry e : plan) {
             Operation op = e.getOp();
@@ -87,7 +87,9 @@ public class Plan {
         String effectiveDate = null;
         for (UpdateEntry update : plan) {
             try {
-                effectiveDate = update.execute();
+                if (!drop.contains(update)) {
+                    effectiveDate = update.execute();
+                }
                 status.recordUpdate(effectiveDate);
             } catch (Exception e) {
                 logger.error("Execution failed with exception", e);
