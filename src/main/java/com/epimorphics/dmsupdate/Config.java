@@ -61,8 +61,9 @@ public class Config {
         } else {
             throw new DUException("Specifed s3 root is malformed: " + root);
         }
-        logArea = config.get(LOG_AREA_PARAM).asText();
-        if (logArea == null) logArea = DEFAULT_LOG_AREA;
+        if (config.has(LOG_AREA_PARAM) && config.get(LOG_AREA_PARAM) != null) {
+            logArea = config.get(LOG_AREA_PARAM).asText();
+        }
     }
     
     public static void init() {
