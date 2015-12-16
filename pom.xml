@@ -8,7 +8,7 @@
   <description>Update data server from S3 state cache</description>
 
   <scm>
-    <developerConnection>scm:git:ssh://git@github.com:epimorphics/dms-update-util.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/epimorphics/dms-update-util.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -189,19 +189,17 @@
         <version>2.6</version>
       </extension>
     
-    <!-- 
       <extension>
         <groupId>org.springframework.build</groupId>
         <artifactId>aws-maven</artifactId>
         <version>5.0.0.RELEASE</version>
       </extension>
-         -->  
 
     </extensions>
   </build>
 
   <distributionManagement>
-  <!-- 
+
      <repository>  
          <id>epi-public-s3-release</id>  
          <name>Epimorphics S3 release repository</name>  
@@ -213,12 +211,6 @@
          <name>Epimorphics S3 snapshot repository</name>  
          <url>s3://epi-repository/snapshot</url>  
      </snapshotRepository>  
- -->
-    <repository>
-      <id>epi-public-repo</id>
-      <url>ftp://epimorphics.com</url>
-    </repository>
-     
  
   </distributionManagement>
 
