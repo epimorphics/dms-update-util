@@ -40,6 +40,7 @@ public class UpdateEntry {
     protected String label;
     protected String effectiveDate;
     protected String format;
+    protected boolean gzipped = false;
     
     public UpdateEntry(String objectName) {
         this.objectName = objectName;
@@ -51,6 +52,10 @@ public class UpdateEntry {
             op = Operation.valueOf( matcher.group(4) );
             arg = Util.decodePercent( matcher.group(5) );
             if (arg != null && arg.contains(".")) {
+                if (arg.endsWith(".gz")) {
+                    gzipped = true;
+                    arg = arg.substring(0, arg.length() - 3);
+                }
                 format = Util.extension(arg);
                 arg = Util.removeExtension(arg);
             } else {
@@ -162,8 +167,7 @@ public class UpdateEntry {
         try {
             InputStream content = object.getObjectContent();
             String fmt = format;
-            if (fmt.endsWith(".gz")) {
-                fmt = fmt.replace(".gz", "");
+            if (gzipped) {
                 content = new GZIPInputStream(content);
             }
             String mediaType = isUpdate ? APPLICATION_SPARQL_UPDATE : mediaTypeFor(fmt);

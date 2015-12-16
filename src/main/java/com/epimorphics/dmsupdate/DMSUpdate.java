@@ -39,19 +39,27 @@ public class DMSUpdate {
     private static final Logger logger = LogManager.getLogger( DMSUpdate.class );
 
     public static void main(String[] args) throws IOException {
-        if (args.length != 1) {
-            System.out.println("usage:   dms-update  --plan|--perform");
+        
+        String command = null;
+        if (args.length == 2 && args[0].startsWith("--config=")) {
+            String configFile = args[0].substring( "--config=".length() );
+            Config.init(configFile);
+            command = args[1];
+        } else if (args.length == 1 && ! args[0].equals("--help")) {
+            Config.init();
+            command = args[0];
+        } else {
+            System.out.println("usage:   dms-update  [--config=config-file.json] --plan|--perform");
             System.exit(1);
         }
         
         // Ensure only one update process at a time
-        File lockFile = new File(Config.LOCK_FILE);
+        File lockFile = new File(Config.getLockFile());
         FileOutputStream lockStream = new FileOutputStream( lockFile );
         FileLock lock = lockStream.getChannel().lock();
         
         try {
             Status status = Status.loadStatus();
-            String command = args[0];
             if (command.equals("--plan")) {
                 createPlan(status).print( System.out );
             } else if (command.equals("--perform")) {

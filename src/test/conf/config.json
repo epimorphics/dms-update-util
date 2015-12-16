@@ -1,6 +1,7 @@
 {
-    "s3root" : "s3://dms-deploy/images/test",
+    "s3root" : "s3://epi-ops/test/dms-update-test",
     "dblocation" : "/tmp",
     "dbname" : "DS-DB",
-    "service" : "http://localhost:3030/ds/"
+    "service" : "http://localhost:3030/ds/",
+    "logArea" : "/tmp/DS-DB"
 }

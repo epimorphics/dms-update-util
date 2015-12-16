@@ -18,33 +18,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
- * Configuration information loaded from /opt/dms-update/config.json
+ * Configuration information loaded from /opt/dms-update/config.json or some other location
  */
+// This was just a set of statics, now it is mutated into a dynamic configuration point
+// its rather ugly using statics rather than a singleton but whatever.
 public class Config {
     public static final String CONFIG_AREA = "/opt/dms-update";
-    public static final String CONFIG_FILE = CONFIG_AREA + "/config.json";
+    public static final String DEFAULT_CONFIG_FILE = CONFIG_AREA + "/config.json";
     public static final String BIN_DIR = CONFIG_AREA + "/bin/";
-    public static final String LOG_AREA = "/var/opt/dms-update";
-    public static final String EFFECTIVE_DATE_FILE = LOG_AREA + "/lastEffectiveDate";
-    public static final String STATUS_FILE = LOG_AREA + "/status.json";
-    public static final String LOCK_FILE = LOG_AREA + "/lock";
+    public static final String DEFAULT_LOG_AREA = "/var/opt/dms-update";
+    private static final String EFFECTIVE_DATE_FILE = "lastEffectiveDate";
+    private static final String STATUS_FILE = "status.json";
+    private static final String LOCK_FILE = "/lock";
     
     public static final String S3ROOT = "s3root";
     public static final String DBLOCATION = "dblocation";
     public static final String DBNAME = "dbname";
     public static final String SERVICE = "service";
+    public static final String LOG_AREA_PARAM = "logArea";
     
     public static final String DEFAULT_DATE = "1970-01-01-00-00-00-0000";
     
     protected static JsonNode config;
     protected static String bucketName;
     protected static String prefix;
+    protected static String logArea = DEFAULT_LOG_AREA;
     
     protected static Pattern S3PAT = Pattern.compile("s3://([^/]+)/(.*)"); 
-    static {
+    
+    public static void init(String configFile) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            config = mapper.readTree(new File(CONFIG_FILE));
+            config = mapper.readTree(new File(configFile));
         } catch (Exception e) {
             throw new DUException("Failed to load configuration file");
         }
@@ -56,10 +61,29 @@ public class Config {
         } else {
             throw new DUException("Specifed s3 root is malformed: " + root);
         }
+        logArea = config.get(LOG_AREA_PARAM).asText();
+        if (logArea == null) logArea = DEFAULT_LOG_AREA;
+    }
+    
+    public static void init() {
+        init(DEFAULT_CONFIG_FILE);
     }
     
     public static String get(String key) {
+        if (config == null) init();
         return config.get(key).asText();
+    }
+    
+    public static String getEffectiveDateFile() {
+        return logArea + "/" + EFFECTIVE_DATE_FILE;
+    }
+    
+    public static String getLockFile() {
+        return logArea + "/" + LOCK_FILE;
+    }
+    
+    public static String getStatusFile() {
+        return logArea + "/" + STATUS_FILE;
     }
     
     public static String getBucketName() {

@@ -69,10 +69,10 @@ public class Status {
     }
     
     public boolean shouldProcess(String date) {
-        if (later(date, today)) {
+        if (notEarlier(date, today)) {
             return !recent.contains(date);
         }
-        return later(date, effectiveDate);
+        return earlier(effectiveDate, date);
     }
     
     /**
@@ -80,7 +80,7 @@ public class Status {
      */
     public void save() {
         deleteOldRecords();
-        save( Config.STATUS_FILE );
+        save( Config.getStatusFile() );
     }
     
     /**
@@ -89,7 +89,7 @@ public class Status {
     public void deleteOldRecords() {
         for (Iterator<String> i = recent.iterator(); i.hasNext();) {
             String date = i.next();
-            if ( !later(date, today) ) {
+            if ( !notEarlier(date, today) ) {
                 i.remove();
             }
         }
@@ -112,23 +112,27 @@ public class Status {
     }
     
     public void recordUpdate(String date) {
-        if ( later(date, effectiveDate) ) {
+        if ( notEarlier(date, effectiveDate) ) {
             effectiveDate = date;
         }
-        if ( later(date, today) ) {
+        if ( notEarlier(date, today) ) {
             recent.add(date);
         }
     }
     
-    public static boolean later(String date1, String date2) {
+    public static boolean notEarlier(String date1, String date2) {
         return date1.compareTo(date2) >= 0;  // Actually later than or same
+    }
+    
+    public static boolean earlier(String date1, String date2) {
+        return date1.compareTo(date2) < 0; 
     }
     
     public static Status loadStatus() {
         try {
-            String statusString = readFile( Config.STATUS_FILE );
+            String statusString = readFile( Config.getStatusFile() );
             if (statusString == null) {
-                statusString = readFile( Config.EFFECTIVE_DATE_FILE );
+                statusString = readFile( Config.getEffectiveDateFile() );
                 if (statusString == null) {
                     statusString = Config.DEFAULT_DATE;
                 }

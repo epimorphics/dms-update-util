@@ -4,6 +4,8 @@
 # Assumes fuseki binary (for running tdbloader) is availabe in /usr/share/fuseki
 # usage: install_dump s3file dbname
 
+/opt/dms-update/bin/stop_fuseki
+
 readonly FUSEKI_BASE=/usr/share/fuseki
 readonly TDBLOADER_MEM="-Xmx1024M"
 readonly FUSEKI_JAR="$FUSEKI_BASE/fuseki-server.jar"

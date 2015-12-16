@@ -62,16 +62,28 @@ public class Plan {
                 seen.put(key, e);
             }
         }
-        plan.removeAll(drop);
     }
     
     /**
      * Write a description of the plan
      */
     public void print(PrintStream out) {
-        for (UpdateEntry e : plan) {
+        for (UpdateEntry e : listUpdates()) {
             out.println( e.asCommand() );
         }
+    }
+    
+    /**
+     * Access the ordered list of non-dropped updates for test purposes
+     */
+    public List<UpdateEntry> listUpdates() {
+        List<UpdateEntry> p = new ArrayList<>( plan.size() );
+        for (UpdateEntry e : plan) {
+            if (!drop.contains(e)) {
+                p.add(e);
+            }
+        }
+        return p;
     }
     
     /**
@@ -84,13 +96,12 @@ public class Plan {
      * @throws IOException 
      */
     public boolean execute() {
-        String effectiveDate = null;
         for (UpdateEntry update : plan) {
             try {
                 if (!drop.contains(update)) {
-                    effectiveDate = update.execute();
+                    update.execute();
                 }
-                status.recordUpdate(effectiveDate);
+                status.recordUpdate( update.getEffectiveDate() );
             } catch (Exception e) {
                 logger.error("Execution failed with exception", e);
                 return false;

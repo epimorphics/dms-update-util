@@ -1,0 +1,10 @@
+#!/bin/bash
+# Script use by dms_update to stop the local fuseki service
+# so that a base image can be installed. Rarely used.
+# This is a configuration point
+# The normal action would be just "service fuseki stop"
+# This version is for dev purposes only
+
+pkill -f fuseki-server
+
+
