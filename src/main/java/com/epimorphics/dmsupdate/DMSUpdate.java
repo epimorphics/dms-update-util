@@ -11,6 +11,7 @@ package com.epimorphics.dmsupdate;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileLock;
 
@@ -110,7 +111,17 @@ public class DMSUpdate {
     }
     
     protected static boolean dbExists() {
-        return new File(Config.getDBAddress()).exists();
+        File dbDir = new File(Config.getDBAddress());
+        if (dbDir.exists() && dbDir.isDirectory() && dbDir.canRead()) {
+            File[] contents = dbDir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".dat") || name.endsWith(".idn");
+                }
+            });
+            return contents.length > 6;
+        }
+        return false;
     }
 
 }
