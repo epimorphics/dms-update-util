@@ -51,7 +51,7 @@ public class UpdateEntry {
             label = matcher.group(3);
             op = Operation.valueOf( matcher.group(4) );
             arg = Util.decodePercent( matcher.group(5) );
-            if (arg != null && arg.contains(".")) {
+            if (arg != null && arg.contains(".") && op != Operation.drop) {
                 if (arg.endsWith(".gz")) {
                     gzipped = true;
                     arg = arg.substring(0, arg.length() - 3);
@@ -63,7 +63,7 @@ public class UpdateEntry {
             }
         }
     }
-
+    
     protected static final Pattern OBJECT_FORMAT = Pattern.compile(".*/([0-9-]+)/([0-9-]+)/([^_]*)_([^_\\.]*)_?(.*)$");
     
     public String getObjectName() {

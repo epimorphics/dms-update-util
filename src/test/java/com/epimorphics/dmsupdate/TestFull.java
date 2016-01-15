@@ -40,6 +40,7 @@ public class TestFull {
     //   - remove @Ignore
     //   - ensure /opt/dms-update/bin is linked to ./bin (or /opt/dms-update linked to .)
     //   - ensure AWS credential set up to access aws-expt
+    //   - run a test fuseki server: fuseki-server --update --mem --port=3030 /ds
     @Ignore
     @Test public void testFull() throws IOException {
         // Set up empty initial state and initial upload batch
@@ -83,6 +84,14 @@ public class TestFull {
         uploadS3(20, Operation.update, "r4b", ".ru", "r4");
         
         plan = plan();
+        assertTrue( plan.execute() ); 
+        status.save();
+        checkGraphs("label", "r1", "r3b", "r4b");
+
+        // Check previous but where a drop with a "." in graph name caused problems
+        uploadS3(13, Operation.drop, "empty", "", "r5.lookslikeanextension");
+        plan = plan();
+        checkPlan(plan, Operation.drop, "http://localhost/graph/r5.lookslikeanextension");
         assertTrue( plan.execute() ); 
         status.save();
         checkGraphs("label", "r1", "r3b", "r4b");
