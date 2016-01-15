@@ -40,7 +40,6 @@ public class TestFull {
     //   - remove @Ignore
     //   - ensure /opt/dms-update/bin is linked to ./bin (or /opt/dms-update linked to .)
     //   - ensure AWS credential set up to access aws-expt
-    //   - run a test fuseki server: fuseki-server --update --mem --port=3030 /ds
     @Ignore
     @Test public void testFull() throws IOException {
         // Set up empty initial state and initial upload batch
