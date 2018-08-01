@@ -69,6 +69,7 @@ public class Status {
     }
     
     public boolean shouldProcess(String date) {
+        if (date == null) return false;
         if (notEarlier(date, today)) {
             return !recent.contains(date);
         }

@@ -61,6 +61,8 @@ public class UpdateEntry {
             } else {
                 format = "";
             }
+        } else {
+            logger.warn("Unexpected object found, skipping: " + objectName);
         }
     }
     
