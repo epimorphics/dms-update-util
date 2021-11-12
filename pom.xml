@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.epimorphics</groupId>
   <artifactId>dms-update-util</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.5</version>
   <name>dms-update-util</name>
   <packaging>jar</packaging>
   <description>Update data server from S3 state cache</description>
 
   <scm>
     <developerConnection>scm:git:ssh://git@github.com/epimorphics/dms-update-util.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>dms-update-util-1.0.5</tag>
   </scm>
 
     <properties>
