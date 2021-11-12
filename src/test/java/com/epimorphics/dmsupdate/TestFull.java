@@ -39,6 +39,8 @@ public class TestFull {
     // To run:
     //   - remove @Ignore
     //   - ensure /opt/dms-update/bin is linked to ./bin (or /opt/dms-update linked to .)
+    //   - copy src/test/conf/config.json /opt/dms-update
+    //   - copy a fuseki server distribution to /usr/share/fuseki
     //   - ensure AWS credential set up to access aws-expt
     @Ignore
     @Test public void testFull() throws IOException {

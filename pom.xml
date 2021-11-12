@@ -12,6 +12,11 @@
     <tag>HEAD</tag>
   </scm>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <aws-sdk-version>1.12.109</aws-sdk-version>
+    </properties>
+
   <repositories>
     <repository>
       <id>apache-repo-releases</id>
@@ -71,7 +76,19 @@
      </snapshots>  
     </repository>  
     
-  </repositories>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws-sdk-version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
   <dependencies>
 
@@ -82,11 +99,10 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-        <groupId>com.amazonaws</groupId>
-        <artifactId>aws-java-sdk-s3</artifactId>
-        <version>1.10.32</version>
-    </dependency>
+      <dependency>
+          <groupId>com.amazonaws</groupId>
+          <artifactId>aws-java-sdk-s3</artifactId>
+      </dependency>
     
     <dependency>
         <groupId>org.json</groupId>
@@ -107,10 +123,6 @@
     </dependency>
  
   </dependencies>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <build>
     <plugins>
