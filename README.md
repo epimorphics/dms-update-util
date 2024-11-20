@@ -2,6 +2,13 @@
 
 Utility to help with data updates within DMS systems.
 
+## Changes
+
+| Version | Comment |
+| 1.0.4 | Stable version for legacy DMS deployments |
+| 1.0.6 | Update AWS SDK for IMDSv2 compatibility |
+| 1.0.8 | Update AWS SDK for EPIA compatibility |
+
 ## Functionality
 
 Allows the state of a replicated set of data servers to be held in S3. Existing servers can catch up to date by replaying updates from the S3 state. New servers can initialize their database from the S3 state.
