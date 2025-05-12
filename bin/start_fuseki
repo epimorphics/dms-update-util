@@ -9,5 +9,5 @@ DBLOCATION=$( jq -r ".dblocation"  $CONFIG)
 DBNAME=$( jq -r ".dbname"  $CONFIG)
 
 cd /usr/share/fuseki
-nohup ./fuseki-server --mgtPort=3131 --update --loc="$DBLOCATION/$DBNAME" /ds &> fuseki.log &
+nohup ./fuseki-server --update --loc="$DBLOCATION/$DBNAME" /ds &> fuseki.log &
 

@@ -53,7 +53,10 @@ public class S3Util {
     public static List<UpdateEntry> listEntries(String prefix) {
         List<UpdateEntry> entries = new ArrayList<>();
         for (String result : listObjects(prefix, true)) {
-            entries.add( new UpdateEntry(result) );
+            if (!result.endsWith("stats.opt")) {
+                // Ignore the (optional) stats.opt which is used for image rebuilding
+                entries.add(new UpdateEntry(result));
+            }
         }
         return entries;
     }
