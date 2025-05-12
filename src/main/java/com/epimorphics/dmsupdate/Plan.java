@@ -93,7 +93,6 @@ public class Plan {
      * Assumes that these leave the fuseki server running so that it
      * can receive further updates.
      * @return true if succeeded
-     * @throws IOException 
      */
     public boolean execute() {
         for (UpdateEntry update : plan) {
