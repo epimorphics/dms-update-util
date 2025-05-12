@@ -9,7 +9,7 @@ Utility to help with data updates within DMS systems.
 | 1.0.4   | Stable version for legacy DMS deployments |
 | 1.0.6   | Update AWS SDK for IMDSv2 compatibility   |
 | 1.0.8   | Update AWS SDK for EPIA compatibility     |
-| 1.0.9   | Supress stats.opt warnings                |
+| 1.0.10  | Suppress stats.opt warnings               |
 
 ## Functionality
 
