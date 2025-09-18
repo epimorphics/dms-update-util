@@ -9,14 +9,13 @@
 
 package com.epimorphics.dmsupdate;
 
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileLock;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 /**
  * <p>Utility for updating a fuseki-powered data server from a data state
@@ -37,7 +36,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public class DMSUpdate {
-    private static final Logger logger = LogManager.getLogger( DMSUpdate.class );
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger( DMSUpdate.class );
 
     public static void main(String[] args) throws IOException {
         

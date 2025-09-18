@@ -9,25 +9,17 @@
 
 package com.epimorphics.dmsupdate;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * Represents an update plan which is a series of update actions
  * determined from the current state and the S3 contents
  */
 public class Plan {
-    private static final Logger logger = LogManager.getLogger( Plan.class );
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger( Plan.class );
     
     protected List<UpdateEntry> plan;
     protected Set<UpdateEntry> drop = new HashSet<>();

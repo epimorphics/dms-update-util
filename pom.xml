@@ -12,10 +12,14 @@
     <tag>HEAD</tag>
   </scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aws-sdk-version>1.12.778</aws-sdk-version>
-    </properties>
+  <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <aws-sdk-version>2.33.8</aws-sdk-version>
+      <jackson.version>2.19.0</jackson.version>
+      <org.json.version>20250517</org.json.version>
+      <junit.version>4.13.2</junit.version>
+      <logback.version>1.5.18</logback.version>
+  </properties>
 
   <repositories>
     <repository>
@@ -55,7 +59,7 @@
     <repository>  
      <id>epi-public-s3-snapshot</id>  
      <name>Epimorphics S3 snapshot repository</name>  
-     <url>s3://epi-repository/snapshot</url>  
+     <url>https://s3-eu-west-1.amazonaws.com/epi-repository/snapshot</url>
      <releases>  
        <enabled>false</enabled>  
      </releases>  
@@ -67,7 +71,7 @@
     <repository>  
      <id>epi-public-s3-release</id>  
      <name>Epimorphics S3 release repository</name>  
-     <url>s3://epi-repository/release</url>  
+     <url>https://s3-eu-west-1.amazonaws.com/epi-repository/release</url>
      <releases>  
        <enabled>true</enabled>  
      </releases>  
@@ -81,8 +85,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-bom</artifactId>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
                 <version>${aws-sdk-version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -95,28 +99,56 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.2</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
 
-      <dependency>
-          <groupId>com.amazonaws</groupId>
-          <artifactId>aws-java-sdk-s3</artifactId>
-      </dependency>
-    
     <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20141113</version>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <version>${aws-sdk-version}</version>
     </dependency>
 
-    <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
-    </dependency>
-    
-    <dependency>
+      <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+          <version>${org.json.version}</version>
+      </dependency>
+
+
+      <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+      <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+          <version>${logback.version}</version>
+          <scope>compile</scope>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-core -->
+      <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+          <version>${logback.version}</version>
+      </dependency>
+
+      <dependency>
+          <groupId>net.logstash.logback</groupId>
+          <artifactId>logstash-logback-encoder</artifactId>
+          <version>8.1</version>
+          <!-- Use runtime scope if the project does not have any compile-time usage of logstash-logback-encoder,
+               such as usage of StructuredArguments/Markers or implementations such as
+               JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
+          <scope>runtime</scope>
+          -->
+      </dependency>
+
+      <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
       <version>1.17</version>

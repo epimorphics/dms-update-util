@@ -9,19 +9,16 @@
 
 package com.epimorphics.dmsupdate;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import com.amazonaws.services.s3.model.S3Object;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 
 /**
  * Represents a single entry in the S3 data state collection.
@@ -29,7 +26,7 @@ import com.sun.jersey.api.client.WebResource;
 public class UpdateEntry {
     private static final String APPLICATION_SPARQL_UPDATE = "application/sparql-update";
 
-    private static final Logger logger = LogManager.getLogger( UpdateEntry.class );
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger( UpdateEntry.class );
     
     private static final int N_RETRIES = 3;
     private static final long WAIT_PERIOD = 3 * 1000;
@@ -165,14 +162,12 @@ public class UpdateEntry {
     }
     
     protected void sendData(boolean isUpdate, boolean isPost) throws IOException {
-        S3Object object = S3Util.getObject(objectName);
+        InputStream content = S3Util.getObject(objectName);
+        if (gzipped) {
+            content = new GZIPInputStream(content);
+        }
         try {
-            InputStream content = object.getObjectContent();
-            String fmt = format;
-            if (gzipped) {
-                content = new GZIPInputStream(content);
-            }
-            String mediaType = isUpdate ? APPLICATION_SPARQL_UPDATE : mediaTypeFor(fmt);
+            String mediaType = isUpdate ? APPLICATION_SPARQL_UPDATE : mediaTypeFor(format);
             WebResource resource = Client.create()
                     .resource(Config.getService() + (isUpdate ? "update" : "data"));
             if (!isUpdate) {
@@ -184,7 +179,7 @@ public class UpdateEntry {
                 throw new DUException("Update failed with response " + response);
             }
         } finally {
-            object.close();
+            content.close();
         }
     }
 
