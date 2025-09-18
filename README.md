@@ -10,6 +10,7 @@ Utility to help with data updates within DMS systems.
 | 1.0.6   | Update AWS SDK for IMDSv2 compatibility   |
 | 1.0.8   | Update AWS SDK for EPIA compatibility     |
 | 1.0.10  | Suppress stats.opt warnings               |
+| 1.1.0   | AWS SDK2, logback instead of log4j        |
 
 ## Functionality
 
