@@ -12,8 +12,7 @@ package com.epimorphics.dmsupdate;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +26,7 @@ import java.util.zip.GZIPInputStream;
 public class UpdateEntry {
     private static final String APPLICATION_SPARQL_UPDATE = "application/sparql-update";
 
-    private static final Logger logger = LogManager.getLogger( UpdateEntry.class );
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger( UpdateEntry.class );
     
     private static final int N_RETRIES = 3;
     private static final long WAIT_PERIOD = 3 * 1000;
