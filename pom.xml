@@ -12,10 +12,11 @@
     <tag>HEAD</tag>
   </scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <aws-sdk-version>1.12.778</aws-sdk-version>
-    </properties>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <aws-sdk-version>2.33.8</aws-sdk-version>
+    <jackson.version>2.19.0</jackson.version>
+  </properties>
 
   <repositories>
     <repository>
@@ -55,7 +56,7 @@
     <repository>  
      <id>epi-public-s3-snapshot</id>  
      <name>Epimorphics S3 snapshot repository</name>  
-     <url>s3://epi-repository/snapshot</url>  
+     <url>https://s3-eu-west-1.amazonaws.com/epi-repository/snapshot</url>
      <releases>  
        <enabled>false</enabled>  
      </releases>  
@@ -67,7 +68,7 @@
     <repository>  
      <id>epi-public-s3-release</id>  
      <name>Epimorphics S3 release repository</name>  
-     <url>s3://epi-repository/release</url>  
+     <url>https://s3-eu-west-1.amazonaws.com/epi-repository/release</url>
      <releases>  
        <enabled>true</enabled>  
      </releases>  
@@ -81,8 +82,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-bom</artifactId>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
                 <version>${aws-sdk-version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -99,16 +100,17 @@
       <scope>test</scope>
     </dependency>
 
-      <dependency>
-          <groupId>com.amazonaws</groupId>
-          <artifactId>aws-java-sdk-s3</artifactId>
-      </dependency>
-    
     <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20141113</version>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <version>${aws-sdk-version}</version>
     </dependency>
+
+      <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>${jackson.version}</version>
+      </dependency>
 
     <dependency>
         <groupId>log4j</groupId>
