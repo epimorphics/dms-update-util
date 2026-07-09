@@ -1,8 +1,12 @@
 # Changelog
 
+## [1.1.2] - 2026-07-09
+
+   * dependency updates - netty, jackson-databind, logback-core
+
 ## [1.1.1]
 
-   * dependency updates
+   * dependency updates - netty, jackson-databind, logback-core
 
 ## [1.1.0]
 

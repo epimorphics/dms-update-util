@@ -14,11 +14,11 @@
 
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <aws-sdk-version>2.43.1</aws-sdk-version>
-      <jackson.version>2.21.2</jackson.version>
+      <aws-sdk-version>2.47.1</aws-sdk-version>
+      <jackson.version>2.22.1</jackson.version>
       <org.json.version>20250517</org.json.version>
       <junit.version>4.13.2</junit.version>
-      <logback.version>1.5.32</logback.version>
+      <logback.version>1.5.37</logback.version>
   </properties>
 
   <repositories>
