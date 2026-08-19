@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.3] - 2026-08-19
+
+  * update AWS SDK to 2.53.1 for transitive vulnerabilities
+
 ## [1.1.2] - 2026-07-09
 
    * dependency updates - netty, jackson-databind, logback-core
