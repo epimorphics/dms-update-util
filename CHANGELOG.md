@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+  * Update AWS SDK to 2.53.3 for latest fixes
+  * Update jackson-databind to 2.22.4 for transitive vulnerabilities
+  * Update json to 20260719 to address reported vulnerabilities
+  * Update logback to 1.6.6 to address reported vulnerabilities
+
 ## [1.1.3] - 2026-08-19
 
   * update AWS SDK to 2.53.1 for transitive vulnerabilities
