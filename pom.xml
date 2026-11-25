@@ -14,11 +14,11 @@
 
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <aws-sdk-version>2.53.1</aws-sdk-version>
-      <jackson.version>2.22.1</jackson.version>
-      <org.json.version>20250517</org.json.version>
+      <aws-sdk-version>2.53.3</aws-sdk-version>
+      <jackson.version>2.22.4</jackson.version>
+      <org.json.version>20260719</org.json.version>
       <junit.version>4.13.2</junit.version>
-      <logback.version>1.5.37</logback.version>
+      <logback.version>1.6.6</logback.version>
   </properties>
 
   <repositories>
@@ -146,6 +146,12 @@
                JsonProvider, AppenderListener, JsonFactoryDecorator, JsonGeneratorDecorator, etc
           <scope>runtime</scope>
           -->
+          <exclusions>
+              <exclusion>
+                  <groupId>com.fasterxml.jackson.core</groupId>
+                  <artifactId>jackson-databind</artifactId>
+              </exclusion>
+          </exclusions>
       </dependency>
 
       <dependency>
